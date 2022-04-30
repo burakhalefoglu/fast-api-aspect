@@ -11,6 +11,16 @@ def after_start(func):
     return wrapper
 
 
+def with_keys(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        out = await func(*args, **kwargs)
+        print("with_keys")
+        print(kwargs)
+        return out
+    return wrapper
+
+
 def before_start(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
@@ -33,11 +43,13 @@ def on_error(func):
 app = FastAPI()
 
 
-@app.get("/")
+@app.get("/{test_path}")
 @before_start
 @after_start
+@with_keys
 @on_error
-async def read_root():
+async def read_root(test_path):
     print("fast_api")
     # raise Exception("fast_api error")
-    return {"Hello": "World"}
+    return {"Hello": "World",
+            "Page": test_path}
