@@ -1,55 +1,30 @@
-from functools import wraps
+import asyncio
 from fastapi import FastAPI
-
-
-def after_start(func):
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        out = await func(*args, **kwargs)
-        print("after_start")
-        return out
-    return wrapper
-
-
-def with_keys(func):
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        out = await func(*args, **kwargs)
-        print("with_keys")
-        print(kwargs)
-        return out
-    return wrapper
-
-
-def before_start(func):
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        print("before_start")
-        return await func(*args, **kwargs)
-    return wrapper
-
-
-def on_error(func):
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        try:
-            return await func(*args, **kwargs)
-        except:
-            print('on_error')
-        return {"Error": "Message"}
-    return wrapper
-
+from aspects.cache_aspect import cache_aspect, cache_remove_aspect
+from aspects.exception_aspect import exception_aspect
+from aspects.log_aspect import debug_log_aspect, error_log_aspect, info_log_aspect
+from aspects.performance_aspect import performance_aspect
+from aspects.security_aspect import security_aspect
+from aspects.validation_aspect import validation_aspect
+from logger.logger import init_log
 
 app = FastAPI()
+init_log()
+validation_schema = {'page': {'type': 'integer'}}
 
 
-@app.get("/{test_path}")
-@before_start
-@after_start
-@with_keys
-@on_error
-async def read_root(test_path):
-    print("fast_api")
-    # raise Exception("fast_api error")
+# All aspect for service layer. But I used for testing on controller!!!
+@app.get("/{page}")
+@exception_aspect
+# @validation_aspect(validation_schema)
+# @info_log_aspect
+# @error_log_aspect
+# @debug_log_aspect
+# @performance_aspect(5)
+# @security_aspect
+# @cache_aspect
+# @cache_remove_aspect
+async def read_root(page):
+    print("fast_api work")
     return {"Hello": "World",
-            "Page": test_path}
+            "Page": page}
