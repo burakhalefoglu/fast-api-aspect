@@ -1,4 +1,5 @@
 import asyncio
+import time
 from fastapi import FastAPI
 from aspects.cache_aspect import cache_aspect, cache_remove_aspect
 from aspects.exception_aspect import exception_aspect
@@ -25,6 +26,10 @@ validation_schema = {'page': {'type': 'integer'}}
 # @cache_aspect
 # @cache_remove_aspect
 async def read_root(page):
+    # time.sleep(6)
     print("fast_api work")
     return {"Hello": "World",
             "Page": page}
+
+
+# to run write this "uvicorn main:app --reload" command on terminal
